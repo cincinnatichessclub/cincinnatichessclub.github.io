@@ -6,14 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cincinnati Chess Club</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
-    <script src="script.js"></script>
+    <!-- <script src="script.js"></script> -->
 </head>
 
-<body>
-    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+<body style="overflow: hidden;">
+
+    <!-- Navbar ----------------------------------------------------------------------->
+    <nav class="navbar is-fixed-top" style="max-width: 100vw;" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item" href="https://bulma.io">
-                <h1 class="is-size-3 has-text-weight-bold">Cincinnati Chess Club</h1>
+            <a class="absolute top-0 left-0" href="https://bulma.io"></a>
+            <img style="width: 55px; height: 55px;" src="image.png">
             </a>
 
             <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
@@ -40,7 +42,8 @@
             <div class="navbar-end">
                 <div class="navbar-item">
                     <div class="buttons">
-                        <a class="button is-light">
+                        <a href="https://www.paypal.com/webapps/hermes?token=7XW44579NJ164331J&useraction=commit&rm=1&wpsFlowRedirectToXorouterSkipHermesStartTime=1725909261474&flowType=WPS&mfid=1725909261278_f6224498529fb"
+                            class="button is-light">
                             Get Membership
                         </a>
                     </div>
@@ -48,36 +51,225 @@
             </div>
         </div>
     </nav>
-        <div class="container">
-            <img src="https://cdn.pixabay.com/photo/2017/09/08/20/29/chess-2730034_1280.jpg" alt="Chess Dark Mode">
+
+    <img style="all: revert; opacity: 0.25; object-fit: cover; max-width: auto; height: 100%;"
+        src="https://cdn.pixabay.com/photo/2017/09/08/20/29/chess-2730034_1280.jpg">
+
+
+    <div style="position: absolute; bottom: 2vh; right: 2vw; max-width: 100vw;">
+        &copy; Cincinnati Chess Club All Rights Reserved.
+    </div>
+    <!-- Hero page -------------------------------------------------------------------->
+    <section class="section" style="position: absolute; top: 30%">
+        <div>
+            <h1 class="title">Welcome to the Cincinnati Chess Club</h1>
+            <p class="subtitle">We host weekly meetings to
+                promote the game of chess in the Cincinnati area by offering a place to play, hosting tournaments, and
+                promoting the United States Chess Federation</p>
+            <a href="">learn more</a>
         </div>
+        <div id="posts"></div>
+    </section>
 
 
-    <!-- 1Oo3M85qW4ZCbnOvWmoJAoZNZyKkPB_JRGWtRGVl4CrQ -->
+
+    <!-- Logic -------------------------------------------------------------------------->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Get all "navbar-burger" elements
+            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+            // Add a click event on each of them
+            $navbarBurgers.forEach(el => {
+                el.addEventListener('click', () => {
+
+                    // Get the target from the "data-target" attribute
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+
+                    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+
+                });
+            });
+
+            // function loadData() {
+
+            //     var sheet_id = "2PACX-1vQSR2L38yt9rcX5YNlczXe55AIQKdbqqvzjP_3jM_nj94jBR74VmpwfwwuEue_j9M9FsnRbSwO0ffeb";
+            //     var url = `https://docs.google.com/spreadsheets/d/e/${sheet_id}/pub?gid=0&single=true&output=csv`;
+
+            //     xmlhttp = new XMLHttpRequest();
+
+            //     xmlhttp.onreadystatechange = function () {
+            //         if (xmlhttp.readyState == 4) {
+            //             console.log(xmlhttp.responseText);
+            //             //alert(xmlhttp.responseText);
+            //         }
+            //     };
+            //     xmlhttp.open("GET", url, true);
+            //     xmlhttp.send(null);
+            // }
+
+            // loadData();
+
+
+            // Function to create event posts
+            function createEventPosts(csvData) {
+                // Parse CSV data
+                const rows = csvData.split('\n').map(row => row.split(','));
+                const headers = rows[0];
+                const events = rows.slice(1).map(row => {
+                    return headers.reduce((obj, header, index) => {
+                        obj[header] = row[index];
+                        return obj;
+                    }, {});
+                });
+
+                // Helper function to format date
+                function formatDate(dateString) {
+                    const [month, day, year] = dateString.split('/');
+                    return new Date(year, month - 1, day).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                }
+
+                // Generate HTML for all events
+                const eventsHTML = events.map(event => `
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden my-8">
+      <img 
+        src="${event.image}" 
+        alt="${event.title}" 
+        class="w-full h-64 object-cover"
+      >
+      <div class="p-6">
+        <h2 class="text-2xl font-bold mb-2 text-gray-800">${event.title}</h2>
+        <p class="text-gray-600 mb-4">${event.description}</p>
+        <div class="flex items-center mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span class="text-gray-700">${formatDate(event.date)}</span>
+        </div>
+        <div class="flex items-center mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span class="text-gray-700">${event.time_start} - ${event.time_end}</span>
+        </div>
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="text-gray-700">Location: ${event.location}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+                // Wrap all events in a container
+                return `
+    <div class="bg-gray-100 min-h-screen py-8">
+      ${eventsHTML}
+    </div>
+  `;
+            }
+
+            // Function to load data and create event posts
+            function loadDataAndCreatePosts() {
+                var sheet_id = "2PACX-1vQSR2L38yt9rcX5YNlczXe55AIQKdbqqvzjP_3jM_nj94jBR74VmpwfwwuEue_j9M9FsnRbSwO0ffeb";
+                var url = `https://docs.google.com/spreadsheets/d/e/${sheet_id}/pub?gid=0&single=true&output=csv`;
+
+                fetch(url)
+                    .then(response => response.text())
+                    .then(data => {
+                        const eventPostsHTML = createEventPosts(data);
+                        document.getElementById('posts').innerHTML = eventPostsHTML;
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            // Call the function to load data and create posts
+            loadDataAndCreatePosts();
+
+        });
+    </script>
 </body>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-        // Get all "navbar-burger" elements
-        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-
-        // Add a click event on each of them
-        $navbarBurgers.forEach(el => {
-            el.addEventListener('click', () => {
-
-                // Get the target from the "data-target" attribute
-                const target = el.dataset.target;
-                const $target = document.getElementById(target);
-
-                // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-                el.classList.toggle('is-active');
-                $target.classList.toggle('is-active');
-
-            });
-        });
-
-    });
-</script>
 
 </html>
+
+<!-- 
+function createEventPosts(data) {
+    // Parse the data string to extract the actual data object
+    const startIndex = data.indexOf('{');
+    const endIndex = data.lastIndexOf('}') + 1;
+    const jsonData = JSON.parse(data.slice(startIndex, endIndex));
+  
+    // Helper function to format date
+    function formatDate(dateString) {
+      const date = new Date(dateString.slice(5, -1));
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+  
+    // Helper function to format time
+    function formatTime(timeString) {
+      const time = new Date(timeString.slice(5, -1));
+      return time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+  
+    // Generate HTML for all events
+    const eventsHTML = jsonData.table.rows.map(event => `
+      <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden my-8">
+        <img 
+          src="${event.c[5].v}" 
+          alt="${event.c[3].v}" 
+          class="w-full h-64 object-cover"
+        >
+        <div class="p-6">
+          <h2 class="text-2xl font-bold mb-2 text-gray-800">${event.c[3].v}</h2>
+          <p class="text-gray-600 mb-4">${event.c[4].v}</p>
+          <div class="flex items-center mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span class="text-gray-700">${formatDate(event.c[0].v)}</span>
+          </div>
+          <div class="flex items-center mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span class="text-gray-700">${formatTime(event.c[1].v)} - ${formatTime(event.c[2].v)}</span>
+          </div>
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span class="text-gray-700">Location: ${event.c[6].v}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  
+    // Wrap all events in a container
+    return `
+      <div class="bg-gray-100 min-h-screen py-8">
+        ${eventsHTML}
+      </div>
+    `;
+  }
+  
+  // Usage
+  const data = '/*O_o*/google.visualization.Query.setResponse({"version":"0.6","reqId":"0","status":"ok","sig":"1474455435","table":{"cols":[{"id":"A","label":"date","type":"date","pattern":"m/d/yyyy"},{"id":"B","label":"time_start","type":"datetime","pattern":"h:mm"},{"id":"C","label":"time_end","type":"datetime","pattern":"h:mm"},{"id":"D","label":"title","type":"string"},{"id":"E","label":"description","type":"string"},{"id":"F","label":"image","type":"string"},{"id":"G","label":"location","type":"number","pattern":"General"}],"rows":[{"c":[{"v":"Date(2024,8,12)","f":"9/12/2024"},{"v":"Date(1899,11,30,18,0,0)","f":"18:00"},{"v":"Date(1899,11,30,22,0,0)","f":"22:00"},{"v":"Conga-Line Chess"},{"v":"chaos"},{"v":"https://media.istockphoto.com/id/479708026/vector/conga-line.jpg?s=612x612&w=0&k=20&c=N7aHirqSdp6NyvHx4j-aSm5Lclpe3BnWsBYYJ-Ju5qk="},{"v":7650.0,"f":"7650"}]}],"parsedNumHeaders":1}});';
+  
+  document.body.innerHTML = createEventPosts(data); -->
