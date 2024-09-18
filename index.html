@@ -12,6 +12,19 @@
 
     <!-- Full Calendar ---------------------------------------------------------------->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.5/main.min.css"
+        integrity="sha512-1P/SRFqI1do4eNtBsGIAqIZIlnmOQkaY7ESI2vkl+q+hl9HSXmdPqotN0McmeZVyR4AWV+NvkP6pKOiVdY/V5A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        .fc-list-table .fc-list-event:hover td {
+            background-color: rgb(18, 13, 13);
+        }
+
+        .fc-list-day-cushion, .fc-list-table .fc-list-day .fc-day .fc-day-thu .fc-day-past{
+            background-color: rgb(22, 16, 16) !important;
+        }
+    </style>
 </head>
 
 <body style="overflow: hidden;">
@@ -91,6 +104,23 @@
     <!-- Logic -------------------------------------------------------------------------->
 
     <script>
+
+        const calendarEl = document.getElementById('calendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: window.innerWidth < 768 ? 'listMonth' : 'dayGridMonth',
+            height: 600,
+            contentHeight: 580,
+            headerToolbar: {
+                left: '',
+                // left: 'listMonth,dayGridMonth',
+                center: 'title',
+                right: 'prev,next today'
+            },
+            aspectRatio: 3,
+            themeSystem: 'standard'
+        });;
+
+
         document.addEventListener('DOMContentLoaded', () => {
 
             // Get all "navbar-burger" elements
@@ -140,7 +170,7 @@
                     // Find the next event within a week
                     const nextEvent = events.find(event => {
                         const eventDate = new Date(event.date);
-                        console.log(eventDate, currentDate, oneWeekFromNow);
+                        // console.log(eventDate, currentDate, oneWeekFromNow);
                         return eventDate >= currentDate && eventDate <= oneWeekFromNow;
                     });
 
@@ -200,6 +230,42 @@
                     return formattedEvent;
                 }
 
+                function getDateObject(date, time) {
+                    const [month, day, year] = date.split('/');
+                    const [hours, minutes] = time.split(':');
+                    return new Date(year, month - 1, day, hours, minutes);
+                }
+
+                for (let event of events) {
+
+                    calendar.addEvent({
+                        title: event.title,
+                        start: getDateObject(event.date, event.time_start),
+                        end: getDateObject(event.date, event.time_end),
+                        className: "fc-event-success",
+                        // classNames: ['text-white'],
+                        // display: 'list-item',
+                        eventDisplay: 'list-item',
+
+
+                        displayEventTime: true,
+                        // allDay: false,
+                        // extendedProps: {
+                        //     color: 'yellow',
+                        //     eventTextColor: 'black',
+                        //     // description: event.description,
+                        //     image: event.image,
+                        //     location: event.location
+                        // }
+                    });
+                }
+
+
+                console.log(calendar.getEvents());
+
+
+                calendar.render();
+
                 // Function to insert the formatted event into the DOM
                 async function insertEventIntoPosts(events) {
                     const formattedEvent = await findAndFormatNextEvent(events);
@@ -230,18 +296,12 @@
             // Call the function to load data and create posts
             loadDataAndCreatePosts();
 
-        });
-    </script>
+            // calendar = new FullCalendar.Calendar(calendarEl, {
+            //     initialView: 'dayGridMonth'
+            // });
 
-    <script>
-
-        document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth'
-            });
-            calendar.render();
         });
+
 
     </script>
 
@@ -249,73 +309,3 @@
 
 
 </html>
-
-<!-- 
-function createEventPosts(data) {
-    // Parse the data string to extract the actual data object
-    const startIndex = data.indexOf('{');
-    const endIndex = data.lastIndexOf('}') + 1;
-    const jsonData = JSON.parse(data.slice(startIndex, endIndex));
-  
-    // Helper function to format date
-    function formatDate(dateString) {
-      const date = new Date(dateString.slice(5, -1));
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    }
-  
-    // Helper function to format time
-    function formatTime(timeString) {
-      const time = new Date(timeString.slice(5, -1));
-      return time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    }
-  
-    // Generate HTML for all events
-    const eventsHTML = jsonData.table.rows.map(event => `
-      <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden my-8">
-        <img 
-          src="${event.c[5].v}" 
-          alt="${event.c[3].v}" 
-          class="w-full h-64 object-cover"
-        >
-        <div class="p-6">
-          <h2 class="text-2xl font-bold mb-2 text-gray-800">${event.c[3].v}</h2>
-          <p class="text-gray-600 mb-4">${event.c[4].v}</p>
-          <div class="flex items-center mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            <span class="text-gray-700">${formatDate(event.c[0].v)}</span>
-          </div>
-          <div class="flex items-center mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            <span class="text-gray-700">${formatTime(event.c[1].v)} - ${formatTime(event.c[2].v)}</span>
-          </div>
-          <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            <span class="text-gray-700">Location: ${event.c[6].v}</span>
-          </div>
-        </div>
-      </div>
-    `).join('');
-  
-    // Wrap all events in a container
-    return `
-      <div class="bg-gray-100 min-h-screen py-8">
-        ${eventsHTML}
-      </div>
-    `;
-  }
-  
-  // Usage
-  const data = '/*O_o*/google.visualization.Query.setResponse({"version":"0.6","reqId":"0","status":"ok","sig":"1474455435","table":{"cols":[{"id":"A","label":"date","type":"date","pattern":"m/d/yyyy"},{"id":"B","label":"time_start","type":"datetime","pattern":"h:mm"},{"id":"C","label":"time_end","type":"datetime","pattern":"h:mm"},{"id":"D","label":"title","type":"string"},{"id":"E","label":"description","type":"string"},{"id":"F","label":"image","type":"string"},{"id":"G","label":"location","type":"number","pattern":"General"}],"rows":[{"c":[{"v":"Date(2024,8,12)","f":"9/12/2024"},{"v":"Date(1899,11,30,18,0,0)","f":"18:00"},{"v":"Date(1899,11,30,22,0,0)","f":"22:00"},{"v":"Conga-Line Chess"},{"v":"chaos"},{"v":"https://media.istockphoto.com/id/479708026/vector/conga-line.jpg?s=612x612&w=0&k=20&c=N7aHirqSdp6NyvHx4j-aSm5Lclpe3BnWsBYYJ-Ju5qk="},{"v":7650.0,"f":"7650"}]}],"parsedNumHeaders":1}});';
-  
-  document.body.innerHTML = createEventPosts(data); -->
