@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Rating Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6 flex flex-col items-center">
+
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
+        <h2 class="text-2xl font-bold mb-4 text-center">Player Rating Manager</h2>
+
+        <!-- Input Section -->
+        <div class="flex space-x-2 mb-4">
+            <input id="playerName" type="text" placeholder="Player Name" class="border p-2 rounded w-1/2 focus:ring-2 focus:ring-blue-400">
+            <input id="playerRating" type="number" placeholder="Rating" class="border p-2 rounded w-1/2 focus:ring-2 focus:ring-blue-400">
+            <button onclick="addPlayer()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add</button>
+        </div>
+
+        <!-- Table Section -->
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border p-2">#</th>
+                        <th class="border p-2">Player Name</th>
+                        <th class="border p-2">Rating</th>
+                    </tr>
+                </thead>
+                <tbody id="playerTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-4 flex justify-end">
+            <button onclick="sortAndGroup()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Sort & Group</button>
+        </div>
+
+        <!-- Group Output -->
+        <div id="groupsOutput" class="mt-6"></div>
+    </div>
+
+    <script>
+        let players = [];
+
+        function addPlayer() {
+            const nameInput = document.getElementById('playerName');
+            const ratingInput = document.getElementById('playerRating');
+
+            const name = nameInput.value.trim();
+            const rating = parseInt(ratingInput.value.trim(), 10);
+
+            if (name && !isNaN(rating)) {
+                players.push({ name, rating });
+                nameInput.value = '';
+                ratingInput.value = '';
+                updateTable();
+                nameInput.focus();
+            }
+        }
+
+        function updateTable() {
+            const tableBody = document.getElementById('playerTable');
+            tableBody.innerHTML = '';
+
+            players.forEach((player, index) => {
+                const row = `<tr class="border">
+                    <td class="border p-2 text-center">${index + 1}</td>
+                    <td class="border p-2">${player.name}</td>
+                    <td class="border p-2 text-center">${player.rating}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function sortAndGroup() {
+            players.sort((a, b) => b.rating - a.rating);
+
+            updateTable();
+
+            let groupedHtml = '<h3 class="text-xl font-bold mb-2 text-center">Groups</h3>';
+            players.forEach((player, index) => {
+                if (index % 4 === 0) groupedHtml += `<div class="bg-gray-200 p-2 mt-2 rounded"><strong>Group ${Math.floor(index / 4) + 1}:</strong><ul class="list-disc pl-4">`;
+                groupedHtml += `<li>${player.name} (${player.rating})</li>`;
+                if (index % 4 === 3 || index === players.length - 1) groupedHtml += `</ul></div>`;
+            });
+
+            document.getElementById('groupsOutput').innerHTML = groupedHtml;
+        }
+    </script>
+
+</body>
+</html>
